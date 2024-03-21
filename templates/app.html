@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Serial Data</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+      /* Add some basic styling */
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+      }
+
+      form {
+        margin-bottom: 20px;
+      }
+
+      .form-group {
+        margin-bottom: 10px;
+      }
+
+      .form-group label {
+        display: block;
+        font-weight: bold;
+      }
+
+      .form-group input,
+      .form-group select {
+        width: 100%;
+        padding: 5px;
+        border-radius: 3px;
+        border: 1px solid #ccc;
+      }
+
+      #createNewButton {
+        display: flex;
+        justify-content: space-evenly;
+      }
+
+      #serialData {
+        background: #181818;
+        color: greenyellow;
+        font-family: monospace;
+        border: black;
+        border-radius: 10px;
+        padding: 10px;
+        margin-top: 20px;
+      }
+
+      #serialMessage {
+        text-wrap: pretty;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Serial Data Interface</h1>
+
+    <!-- Form for creating a new button -->
+    <section id="createNewButton">
+      <div>
+        <h2>Create New Button</h2>
+        <form
+          id="newButton"
+          method="POST"
+          action="#">
+          <div class="form-group">
+            <label for="bName">New Button Name:</label>
+            <input
+              type="text"
+              id="bName"
+              name="bName" />
+          </div>
+          <input
+            type="submit"
+            value="Save" />
+        </form>
+      </div>
+      <div>
+        <h2>Captured Message</h2>
+        <div id="capturedMessage"></div>
+        <p id="capturedMessageStatus"></p>
+      </div>
+    </section>
+
+    <!-- Form for sending data -->
+    <section>
+      <h2>Send Data</h2>
+      <form
+        id="sendData"
+        method="POST"
+        action="#">
+        <div class="form-group">
+          <label for="button-select">Choose a button:</label>
+          <select
+            name="buttons"
+            id="button-select">
+          </select>
+        </div>
+        <input
+          type="submit"
+          value="Press" />
+      </form>
+    </section>
+
+    <!-- Section for displaying captured message -->
+    <section></section>
+
+    <!-- Section for displaying live serial data -->
+    <section>
+      <h2>Live Serial Data</h2>
+      <div id="connectionStatus"></div>
+      <div id="serialData"></div>
+    </section>
+
+    <script type="text/javascript">
+      $(document).ready(function () {
+        // Connect to the Socket.IO server
+        var socket = io.connect(
+          "http://" + document.domain + ":" + location.port
+        );
+
+        // Event handler for new connections
+        // This will update the connection status in the UI
+        socket.on("connection_status", function (msg, cb) {
+          $("#connectionStatus").text(msg.status);
+          if (cb) cb();
+        });
+
+        // Event handler for new serial data
+        // This will update the serial data log in the UI
+        socket.on("serial_data", function (msg, cb) {
+          var data = msg.data;
+          if ($("#serialData p").length >= 10) {
+            $("#serialData p:first").remove();
+          }
+          $("#serialData").append(
+            $("<p>").attr("id", "serialMessage").text("MSG " + msg.time + ": " + data)
+          );
+          if (cb) cb();
+        });
+
+        // Event handler for new JSON data
+        // This will update the captured message in the UI
+        socket.on("json_data", function (msg, cb) {
+          $("#capturedMessage").empty();
+          $("#capturedMessage").append(
+            $("<p>").text("Protocol: " + msg.protocol)
+          );
+          $("#capturedMessage").append(
+            $("<p>").text("Address: " + msg.address)
+          );
+          $("#capturedMessage").append(
+            $("<p>").text("Command: " + msg.command)
+          );
+          if (cb) cb();
+        });
+
+        // Event handler for the form submission
+        // This will send the selected button to the server
+        $("form#sendData").submit(function (event) {
+          var selectedOption = $("#button-select").val();
+          socket.emit("send_message", { button: selectedOption });
+          return false;
+        });
+
+        // Event handler for the new button form submission
+        // This will send the new button name and message to the server
+        $("form#newButton").submit(function (event) {
+          var newButtonName = $("#bName").val();
+          var newButtonStatus = $("#capturedMessageStatus");
+          if (newButtonName == "") {
+            newButtonStatus.text("Please enter a button name.");
+            return false;
+          }
+          socket.emit("add_button", {
+            buttonName: newButtonName,
+          });
+          return false;
+        });
+
+        // Event handler for new JSON data
+        // This will update the captured message in the UI
+        socket.on("update_options", function (msg, cb) {
+          $("#button-select").empty();
+          $("#button-select").append(
+            $("<option>").text("--Please choose an option--").val("")
+          );
+          for (var i = 0; i < msg.options.length; i++) {
+            $("#button-select").append(
+              $("<option>").text(msg.options[i]).val(msg.options[i])
+            );
+          }
+          if (cb) cb();
+        });
+      });
+    </script>
+  </body>
+</html>
