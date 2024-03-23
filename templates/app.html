@@ -4,53 +4,7 @@
     <title>Serial Data</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <style>
-      /* Add some basic styling */
-      body {
-        font-family: Arial, sans-serif;
-        margin: 20px;
-      }
-
-      form {
-        margin-bottom: 20px;
-      }
-
-      .form-group {
-        margin-bottom: 10px;
-      }
-
-      .form-group label {
-        display: block;
-        font-weight: bold;
-      }
-
-      .form-group input,
-      .form-group select {
-        width: 100%;
-        padding: 5px;
-        border-radius: 3px;
-        border: 1px solid #ccc;
-      }
-
-      #createNewButton {
-        display: flex;
-        justify-content: space-evenly;
-      }
-
-      #serialData {
-        background: #181818;
-        color: greenyellow;
-        font-family: monospace;
-        border: black;
-        border-radius: 10px;
-        padding: 10px;
-        margin-top: 20px;
-      }
-
-      #serialMessage {
-        text-wrap: pretty;
-      }
-    </style>
+    <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/app.css') }}">
   </head>
   <body>
     <h1>Serial Data Interface</h1>
@@ -85,20 +39,7 @@
     <!-- Form for sending data -->
     <section>
       <h2>Send Data</h2>
-      <form
-        id="sendData"
-        method="POST"
-        action="#">
-        <div class="form-group">
-          <label for="button-select">Choose a button:</label>
-          <select
-            name="buttons"
-            id="button-select"></select>
-        </div>
-        <input
-          type="submit"
-          value="Press" />
-      </form>
+      <table id="button-table"></table>
     </section>
 
     <!-- Section for displaying captured message -->
@@ -158,10 +99,10 @@
 
         // Event handler for the form submission
         // This will send the selected button to the server
-        $("form#sendData").submit(function (event) {
-          var selectedOption = $("#button-select").val();
+        $(document).on("submit", "form#sendData", function (event) {
+          var selectedOption = $(this).find('input[type="submit"]').val();
           socket.emit("send_message", { button: selectedOption });
-          return false;
+          event.preventDefault();
         });
 
         // Event handler for the new button form submission
@@ -182,14 +123,31 @@
         // Event handler for new JSON data
         // This will update the captured message in the UI
         socket.on("update_options", function (msg, cb) {
-          $("#button-select").empty();
-          $("#button-select").append(
-            $("<option>").text("--Please choose an option--").val("")
-          );
+          $("#button-table").empty();
           for (var i = 0; i < msg.options.length; i++) {
-            $("#button-select").append(
-              $("<option>").text(msg.options[i]).val(msg.options[i])
+            //for each button in the message, create a new button in groups of three within the table
+            // these need to be able to be detected by the server when pressed
+            if (i % 3 == 0) {
+              $("#button-table").append("<tr>");
+            }
+            $("#button-table").append(
+              $("<td>").append(
+                $("<form>")
+                  .attr("id", "sendData")
+                  .attr("method", "POST")
+                  .attr("action", "#")
+                  .append(
+                    $("<input>")
+                      //.attr("id", msg.options[i])
+                      .attr("type", "submit")
+                      .text(msg.options[i])
+                      .val(msg.options[i])
+                  )
+              )
             );
+            if (i % 3 == 2) {
+              $("#button-table").append("</tr>");
+            }
           }
           if (cb) cb();
         });

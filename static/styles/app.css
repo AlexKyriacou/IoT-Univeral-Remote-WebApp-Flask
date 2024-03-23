@@ -1,0 +1,52 @@
+body {
+  font-family: Arial, sans-serif;
+  margin: 20px;
+  background-color: silver;
+}
+
+#createNewButton {
+  display: flex;
+  justify-content: space-evenly;
+}
+
+#button-table {
+  display: table;
+  width: 100%;
+}
+
+#sendData input {
+  font-variant: small-caps;
+  display: table-cell;
+  width: 100%;
+  padding: 10px;
+  margin: 5px;
+  background: #181818;
+  color: wheat;
+  border: inset;
+  border-radius: 15px;
+  border-color: black;
+}
+
+#sendData input:hover {
+  background: #303030;
+  color: white;
+}
+
+#sendData input:active {
+  background: #606060;
+  color: white;
+}
+
+#serialData {
+  background: #181818;
+  color: greenyellow;
+  font-family: monospace;
+  border: black;
+  border-radius: 10px;
+  padding: 10px;
+  margin-top: 20px;
+}
+
+#serialMessage {
+  text-wrap: pretty;
+}
