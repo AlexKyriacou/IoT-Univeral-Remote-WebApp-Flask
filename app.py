@@ -141,6 +141,6 @@ if __name__ == "__main__":
     ser.flush()
     conn = sqlite3.connect('stored-options.db')
     DBUtils.initialise_ir_data_tables(conn)
-    socketio.run(app)
+    socketio.run(app, host='0.0.0.0')
     if conn:
         conn.close()

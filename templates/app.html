@@ -93,8 +93,7 @@
           <label for="button-select">Choose a button:</label>
           <select
             name="buttons"
-            id="button-select">
-          </select>
+            id="button-select"></select>
         </div>
         <input
           type="submit"
@@ -134,7 +133,9 @@
             $("#serialData p:first").remove();
           }
           $("#serialData").append(
-            $("<p>").attr("id", "serialMessage").text("MSG " + msg.time + ": " + data)
+            $("<p>")
+              .attr("id", "serialMessage")
+              .text("MSG " + msg.time + ": " + data)
           );
           if (cb) cb();
         });
