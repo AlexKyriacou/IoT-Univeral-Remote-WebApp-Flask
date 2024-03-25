@@ -1,6 +1,6 @@
 from datetime import datetime
 import sqlite3
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 from flask_socketio import SocketIO, emit
 from threading import Lock
 import serial
@@ -71,6 +71,14 @@ def hello_world():
     return render_template('app.html')
 
 
+@app.route("/create_button", methods=['GET', 'POST'])
+def create_button():
+    if request.method == 'POST':
+        return render_template('app.html')
+        
+    return render_template('create-button.html')
+
+
 @socketio.event
 def connect():
     global thread
@@ -114,6 +122,8 @@ def handle_message(msg):
 @socketio.on('add_button')
 def handle_add_button(msg):
     global current_json_data
+    if current_json_data == "":
+        return
     conn = sqlite3.connect('stored-options.db')
     try:
         with conn:

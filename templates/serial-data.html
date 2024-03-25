@@ -1,0 +1,27 @@
+<section>
+    <h2>Live Serial Data</h2>
+    <div id="serialData"></div>
+</section>
+<script type="text/javascript">
+    $(document).ready(function () {
+      // Connect to the Socket.IO server
+      var socket = io.connect(
+        "http://" + document.domain + ":" + location.port
+      );
+      
+      // Event handler for new serial data
+      // This will update the serial data log in the UI
+      socket.on("serial_data", function (msg, cb) {
+        var data = msg.data;
+        if ($("#serialData p").length >= 10) {
+          $("#serialData p:first").remove();
+        }
+        $("#serialData").append(
+          $("<p>")
+            .attr("id", "serialMessage")
+            .text("MSG " + msg.time + ": " + data)
+        );
+        if (cb) cb();
+      });
+    });
+  </script>

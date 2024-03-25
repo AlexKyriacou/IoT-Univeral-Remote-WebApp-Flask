@@ -4,9 +4,17 @@ body {
   background-color: silver;
 }
 
-#createNewButton {
-  display: flex;
-  justify-content: space-evenly;
+a {
+  font-variant: small-caps;
+  display: table-cell;
+  width: 100%;
+  padding: 10px;
+  margin: 5px;
+  background: #181818;
+  color: wheat;
+  border: inset;
+  border-radius: 15px;
+  border-color: black;
 }
 
 #button-table {
@@ -49,4 +57,56 @@ body {
 
 #serialMessage {
   text-wrap: pretty;
+}
+
+#form input {
+  font-variant: small-caps;
+  display: table-cell;
+  width: 100%;
+  padding: 10px;
+  margin: 5px;
+  background: #181818;
+  color: wheat;
+  border: inset;
+  border-radius: 15px;
+  border-color: black;
+}
+
+#form input:hover {
+  background: #303030;
+  color: white;
+}
+
+#form input:active {
+  background: #606060;
+  color: white;
+}
+
+form input[type="submit"] {
+  background: #181818;
+  color: wheat;
+  border: inset;
+  border-radius: 15px;
+  border-color: black;
+}
+
+form input[type="submit"]:hover {
+}
+
+form input[type="submit"]:active {
+  background: #606060;
+  color: white;
+}
+
+form input[type="text"] {
+  font-variant: small-caps;
+  display: table-cell;
+  width: 100%;
+  padding: 10px;
+  margin: 5px;
+  background: #181818;
+  color: wheat;
+  border: inset;
+  border-radius: 15px;
+  border-color: black;
 }

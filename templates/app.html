@@ -8,33 +8,13 @@
   </head>
   <body>
     <h1>Serial Data Interface</h1>
+    <div id="connectionStatus"></div>
 
     <!-- Form for creating a new button -->
-    <section id="createNewButton">
-      <div>
-        <h2>Create New Button</h2>
-        <form
-          id="newButton"
-          method="POST"
-          action="#">
-          <div class="form-group">
-            <label for="bName">New Button Name:</label>
-            <input
-              type="text"
-              id="bName"
-              name="bName" />
-          </div>
-          <input
-            type="submit"
-            value="Save" />
-        </form>
-      </div>
-      <div>
-        <h2>Captured Message</h2>
-        <div id="capturedMessage"></div>
-        <p id="capturedMessageStatus"></p>
-      </div>
-    </section>
+    <div>
+      <!-- Link to creating a new button page -->
+      <a href="{{ url_for('create_button') }}">Create New Button</a>
+    </div>
 
     <!-- Form for sending data -->
     <section>
@@ -45,12 +25,8 @@
     <!-- Section for displaying captured message -->
     <section></section>
 
-    <!-- Section for displaying live serial data -->
-    <section>
-      <h2>Live Serial Data</h2>
-      <div id="connectionStatus"></div>
-      <div id="serialData"></div>
-    </section>
+    <!-- Section for displaying live serial data from flask template -->
+    {% include 'serial-data.html' %}
 
     <script type="text/javascript">
       $(document).ready(function () {
@@ -63,21 +39,6 @@
         // This will update the connection status in the UI
         socket.on("connection_status", function (msg, cb) {
           $("#connectionStatus").text(msg.status);
-          if (cb) cb();
-        });
-
-        // Event handler for new serial data
-        // This will update the serial data log in the UI
-        socket.on("serial_data", function (msg, cb) {
-          var data = msg.data;
-          if ($("#serialData p").length >= 10) {
-            $("#serialData p:first").remove();
-          }
-          $("#serialData").append(
-            $("<p>")
-              .attr("id", "serialMessage")
-              .text("MSG " + msg.time + ": " + data)
-          );
           if (cb) cb();
         });
 

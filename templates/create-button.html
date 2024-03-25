@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Serial Data</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="{{ url_for('static',filename='styles/app.css') }}" />
+  </head>
+  <body>
+    <div>
+      <div id="card">
+        <h2>Create New Button</h2>
+        <form
+          id="newButton"
+          method="POST"
+          action="#">
+          <input
+            type="text"
+            id="bName"
+            name="bName"
+            placeholder="Enter New Button Name" />
+          <input
+            type="submit"
+            value="Save" />
+        </form>
+      </div>
+      <div id="card">
+        <h2>Captured Message</h2>
+        <div id="capturedMessage"></div>
+      </div>
+      <p id="capturedMessageStatus"></p>
+    </div>
+    {% include 'serial-data.html' %}
+    <script type="text/javascript">
+      $(document).ready(function () {
+        // Connect to the Socket.IO server
+        var socket = io.connect(
+          "http://" + document.domain + ":" + location.port
+        );
+
+        // Event handler for new JSON data
+        // This will update the captured message in the UI
+        socket.on("json_data", function (msg, cb) {
+          $("#capturedMessage").empty();
+          $("#capturedMessage").append(
+            $("<p>").text("Protocol: " + msg.protocol)
+          );
+          $("#capturedMessage").append(
+            $("<p>").text("Address: " + msg.address)
+          );
+          $("#capturedMessage").append(
+            $("<p>").text("Command: " + msg.command)
+          );
+          if (cb) cb();
+        });
+
+        // Event handler for the new button form submission
+        // This will send the new button name and message to the server
+        $("form#newButton").submit(function (event) {
+          var newButtonName = $("#bName").val();
+          var newButtonStatus = $("#capturedMessageStatus");
+          if (newButtonName == "") {
+            newButtonStatus.text("Please enter a button name.");
+            return false;
+          }
+          if ($("#capturedMessage p").length < 3) {
+            newButtonStatus.text("Please capture a message.");
+            return false;
+          }
+          socket.emit("add_button", {
+            buttonName: newButtonName,
+          });
+        });
+      });
+    </script>
+  </body>
+</html>
